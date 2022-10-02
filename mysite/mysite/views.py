@@ -4,26 +4,38 @@ from django.shortcuts import render
 from matplotlib.pyplot import text
 
 def index(request):
-    params = {
-        'name': 'Roohan',
-    }
-    return render(request, 'index.html', params)
-    # return HttpResponse('Hello')
+    return render(request, 'index.html')
 
-def removepunc(request):
-    djtext = request.GET.get('text','default')
-    print(djtext)
+def analyze(request):
+    djtext = request.GET.get('text', 'default')
+    removepunc = request.GET.get('removepunc','off')
+    capitalize = request.GET.get('capitalize','off')
+    spaceremove = request.GET.get('spaceremove','off')
+    charcount = request.GET.get('charcount','off')
 
-    return HttpResponse('removepunc')
+    if charcount == 'on':
+        analyzed = len(djtext)
+        params = {'purpose': 'Count Characters', 'analyzed_text': analyzed}
+        return render(request, 'punc.html', params)
 
-def capitalize(request):
-    return HttpResponse('capitalize')
+    if spaceremove == 'on':
+        analyzed = djtext.strip()
+        params = {'purpose': 'Space Remove', 'analyzed_text': analyzed}
+        return render(request, 'punc.html', params)
 
-def spaceremove(request):
-    return HttpResponse('spaceremove')
+    if capitalize == 'on':
+        analyzed = djtext.upper()
+        params = {'purpose': 'Capitalize', 'analyzed_text': analyzed}
+        return render(request, 'punc.html', params)    
 
-def newlineremove(request):
-    return HttpResponse('newlineremove')
-
-def charcount(request):
-    return HttpResponse('charcount')
+    if removepunc == 'on':
+        punctuations = '''!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~'''
+        analyzed = ''
+        for char in djtext:
+            if char not in punctuations:
+                analyzed = analyzed + char
+        params = {'purpose': 'Remove Punctuations', 'analyzed_text': analyzed}
+        return render(request, 'punc.html', params)    
+        
+    else:
+        return HttpResponse('Please Check Boxes')
